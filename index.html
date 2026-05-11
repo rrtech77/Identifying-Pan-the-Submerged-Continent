@@ -2488,21 +2488,26 @@
   });
 
   // If page loaded with a hash (arriving from another page),
-  // instantly reveal ALL fade-in elements so the browser can
-  // calculate positions correctly, then scroll to target with nav offset.
+  // instantly reveal ALL fade-in elements, then scroll precisely after render.
   if (window.location.hash) {
+    // Reveal all elements immediately so heights are correct
     document.querySelectorAll('.fade-in').forEach(function(el) {
       el.classList.add('visible');
     });
-    // After everything is rendered, scroll to target accounting for sticky nav
-    window.addEventListener('load', function() {
+    // Scroll to top instantly to prevent browser's own hash scroll
+    history.scrollRestoration = 'manual';
+    window.scrollTo(0, 0);
+    // After a short delay (let fonts/images affect layout), scroll to target
+    function scrollToHash() {
       var target = document.querySelector(window.location.hash);
       if (target) {
         var navHeight = document.querySelector('.site-nav') ? document.querySelector('.site-nav').offsetHeight : 0;
-        var targetTop = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
+        var targetTop = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 8;
         window.scrollTo({ top: targetTop, behavior: 'instant' });
       }
-    });
+    }
+    setTimeout(scrollToHash, 100);
+    setTimeout(scrollToHash, 400);
   }
 
   // Scroll fade-in (only matters when no hash on load)
