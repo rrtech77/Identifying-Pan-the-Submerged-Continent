@@ -2489,10 +2489,43 @@
         entry.target.classList.add('visible');
       }
     });
-  }, { threshold: 0.08 });
+  }, { threshold: 0.01, rootMargin: '0px 0px -10px 0px' });
 
   document.querySelectorAll('.fade-in').forEach(function(el) {
     observer.observe(el);
+  });
+
+  // Make anchor target immediately visible when navigating to a hash
+  function revealAnchorTarget() {
+    var hash = window.location.hash;
+    if (hash) {
+      var target = document.querySelector(hash);
+      if (target) {
+        // Reveal the target itself
+        target.classList.add('visible');
+        // Also reveal all fade-in elements inside it
+        target.querySelectorAll('.fade-in').forEach(function(el) {
+          el.classList.add('visible');
+        });
+        // Reveal any ancestor fade-in elements
+        var parent = target.parentElement;
+        while (parent) {
+          if (parent.classList && parent.classList.contains('fade-in')) {
+            parent.classList.add('visible');
+          }
+          parent = parent.parentElement;
+        }
+      }
+    }
+  }
+
+  // Run on page load and on any hash change
+  revealAnchorTarget();
+  window.addEventListener('hashchange', function() {
+    revealAnchorTarget();
+    // Small delay to let browser scroll, then re-check position
+    setTimeout(revealAnchorTarget, 50);
+    setTimeout(revealAnchorTarget, 150);
   });
 </script>
 </body>
