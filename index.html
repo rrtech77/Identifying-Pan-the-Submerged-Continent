@@ -33,6 +33,11 @@
     --glow-gold: 0 0 20px rgba(200,150,42,0.3);
   }
 
+  /* Offset anchor targets for sticky nav */
+  [id] {
+    scroll-margin-top: 80px;
+  }
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   html { scroll-behavior: smooth; }
@@ -2484,10 +2489,19 @@
 
   // If page loaded with a hash (arriving from another page),
   // instantly reveal ALL fade-in elements so the browser can
-  // calculate positions correctly before scrolling to the target.
+  // calculate positions correctly, then scroll to target with nav offset.
   if (window.location.hash) {
     document.querySelectorAll('.fade-in').forEach(function(el) {
       el.classList.add('visible');
+    });
+    // After everything is rendered, scroll to target accounting for sticky nav
+    window.addEventListener('load', function() {
+      var target = document.querySelector(window.location.hash);
+      if (target) {
+        var navHeight = document.querySelector('.site-nav') ? document.querySelector('.site-nav').offsetHeight : 0;
+        var targetTop = target.getBoundingClientRect().top + window.pageYOffset - navHeight - 16;
+        window.scrollTo({ top: targetTop, behavior: 'instant' });
+      }
     });
   }
 
