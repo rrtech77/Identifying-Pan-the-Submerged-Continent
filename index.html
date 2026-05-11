@@ -2482,7 +2482,16 @@
     }
   });
 
-  // Scroll fade-in
+  // If page loaded with a hash (arriving from another page),
+  // instantly reveal ALL fade-in elements so the browser can
+  // calculate positions correctly before scrolling to the target.
+  if (window.location.hash) {
+    document.querySelectorAll('.fade-in').forEach(function(el) {
+      el.classList.add('visible');
+    });
+  }
+
+  // Scroll fade-in (only matters when no hash on load)
   const observer = new IntersectionObserver(function(entries) {
     entries.forEach(function(entry) {
       if (entry.isIntersecting) {
@@ -2501,13 +2510,10 @@
     if (hash) {
       var target = document.querySelector(hash);
       if (target) {
-        // Reveal the target itself
         target.classList.add('visible');
-        // Also reveal all fade-in elements inside it
         target.querySelectorAll('.fade-in').forEach(function(el) {
           el.classList.add('visible');
         });
-        // Reveal any ancestor fade-in elements
         var parent = target.parentElement;
         while (parent) {
           if (parent.classList && parent.classList.contains('fade-in')) {
@@ -2523,7 +2529,6 @@
   revealAnchorTarget();
   window.addEventListener('hashchange', function() {
     revealAnchorTarget();
-    // Small delay to let browser scroll, then re-check position
     setTimeout(revealAnchorTarget, 50);
     setTimeout(revealAnchorTarget, 150);
   });
